@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>个人所得税计算</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name='description' content='个人所得税计算,计算,五险一金计算,五险一金,个人所得税'>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <style>
+        /*
+        reset.css
+        */
+        html, body{
+            padding:0px;
+            margin:0px;
+            padding:10px;
+        }
+        ul{
+            margin:10px;
+            padding:0px;
+        }
+        h1{
+            margin-top:10px;
+            margin-bottom:10px;
+            font-size: 25px
+        }
+        /*Normal CSS*/
+        #price > ul >li{
+            list-style: none;
+            border:1px solid #eee;
+            box-shadow: 3px 3px 5px #aaa;
+            background-color:olivedrab;
+            padding:5px 10px;
+            margin:5px;
+            color:#fff;
+        }
+        #price > ul > span{
+            display: inline-block;
+            width:100%;
+            text-align: left;
+        }
+        #price > button{
+            display: inline-block;
+            width:100%;
+        }
+        #price input{
+            border:1px solid #aaa;
+            box-sizing: border-box;
+            margin-top:10px;
+            display: inline-block;
+            width:100%;
+            height:2rem;
+        }
+        a{
+            text-decoration: none;
+            color:olivedrab;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="price">
+        <h1>个人所得税计算</h1>
+        <input id='input-price' @keyup="getSalary($event)" placeholder="在此输入税前工资金额"></input>
+        <div id="badge">
+                <!--
+                <span v-if="this.salary>5000">不错哦</span>
+                <span v-if="this.salary>10000">不错哦棒棒的👍</span>
+                <span v-if="this.salary>15000">哇塞，高收入人群哦</span>
+                <span v-if="this.salary>20000">哟呵，你已经步入顶级高收入人群</span>
+                <span v-if="this.salary>50000">打工一族的顶峰</span>
+                <span v-if="this.salary>80000">打工皇帝</span>-->
+                <span v-if="this.salary>20000" style="background-color:crimson;color:#fff">土豪，我们还有机会做朋友吗</span>
+        </div>
+        <ul>
+            <span><strong>个人所得税</strong></span>
+            <li>税前工资: {{salary}}元</li>
+            <li>个人所得税：{{Math.round(tax)}}元</li>
+            <li>个税后工资： {{afterTax}}元</li>
+        </ul>
+        <ul>
+            <span><strong>五险一金缴纳</strong></span>
+            <li>住房公积金: {{Math.round(house)}}元<br><small>税率12%(个人出资额)</small></li>
+            <li>养老保险：{{Math.round(hospital)}}元 </li>
+            <li>失业保险： {{Math.round(unemployment)}}元</li>
+            <li>养老保险： {{Math.round(age)}}元</li>            
+            <li>总计： {{Math.round(sumSecurity)}}元</li>   
+        </ul>
+        <ul>总计税后工资：
+            <li>
+                {{Math.round(afterAll)}}
+            </li>
+        </ul>
+        </ul>
+    </div>
+
+    <footer>
+        <a href="mailto:88dejun@gmail.com?subject=个税计算反馈&body=Hi,dejun,我想反馈的问题是：">发送邮件反馈计算问题</a>
+    </footer>
+
+    <script>
+        var myApp = new Vue({
+            el: '#price',
+            data: {
+                salary: 0,
+            },
+            computed:{
+                tax:{
+                    get:function(){
+                        if(this.salary<=1500)
+                            return this.salary * 0.03;
+                        if(this.salary<=4500)
+                            return (this.salary-1500)*0.1 + 1500*0.03;
+                        if(this.salary<=9000)
+                            return (this.salary-4500)*0.2 + 3000*0.1 + 1500*0.03;
+                        if(this.salary<=35000)
+                            return (this.salary-9000)*0.25 + 4500*0.2 + 3000*0.1 + 1500*0.03;
+                        if(this.salary<=55000)
+                            return (this.salary-35000)*0.3 +26000*0.25 + 4500*0.2 + 3000*0.1 + 1500*0.03;
+                        if(this.salary<=80000)
+                            return (this.salary-55000)*0.35 + 20000*0.3 +26000*0.25 + 4500*0.2 + 3000*0.1 + 1500*0.03;
+                        else
+                            return (this.salary-80000)*0.45 + 25000*0.35 + 20000*0.3 +26000*0.25 + 4500*0.2 + 3000*0.1 + 1500*0.03;
+                    },
+                    set:function(value){
+                        this.salary = Math.round(value / 0.5);
+                    }
+                },
+                afterTax:function(){
+                    return Math.round(this.salary - this.tax);
+                },
+                age:function(){
+                    return this.salary * 0.08;
+                },
+                unemployment:function(){
+                    return this.salary * 0.01;
+                },
+                hospital:function(){
+                    return this.salary * 0.02;
+                },
+                house:function(){
+                    return this.salary * 0.08;
+                },
+                sumSecurity:function(){
+                    return this.age + this.unemployment + this.hospital + this.house
+                },
+                afterAll:function(){
+                    return this.afterTax-this.sumSecurity
+                }
+            },
+            methods:{
+                getSalary:function(event){
+                    console.log(event.srcElement.value)
+                    this.salary = Math.round(event.srcElement.value);
+                }
+            }
+        });
+    </script>
+    <!-- 因为 AJAX 库和通用工具的生态已经相当丰富，Vue 核心代码没有重复 -->
+    <!-- 提供这些功能以保持精简。这也可以让你自由选择自己更熟悉的工具。 -->
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+</body>
+</html>
